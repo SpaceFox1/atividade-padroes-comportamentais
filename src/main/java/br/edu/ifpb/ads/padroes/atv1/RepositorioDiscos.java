@@ -1,5 +1,7 @@
 package br.edu.ifpb.ads.padroes.atv1;
 
+import br.edu.ifpb.ads.padroes.atv1.interesse.IInteressado;
+
 import java.util.LinkedList;
 import java.util.List;
 
@@ -11,13 +13,15 @@ import java.util.List;
 public class RepositorioDiscos {
 
     private List<Disco> discos = new LinkedList<>();
-    private String canalNotificacao;
+    private List<IInteressado> interessados = new LinkedList<>();
 
-    private List<String> notificacoesDisco = new LinkedList<>();
-    private List<String> notificacoesArtista = new LinkedList<>();
-    private List<String> notificacoesGenero = new LinkedList<>();
+    public void registrarInteressado(IInteressado interessado) {
+        interessados.add(interessado);
+    }
 
-    private ServicoNotificacao servicoNotificacao = new ServicoNotificacao();
+    public void removerInteressado(IInteressado interessado) {
+        interessados.remove(interessado);
+    }
 
     public List<Disco> buscarDiscos(String titulo) {
         return discos.stream().filter(d -> d.getTitulo().toLowerCase()
@@ -47,38 +51,8 @@ public class RepositorioDiscos {
         discos.remove(disco);
     }
 
-    public String getCanalNotificacao() {
-        return canalNotificacao;
-    }
-
-    public void setCanalNotificacao(String canalNotificacao) {
-        this.canalNotificacao = canalNotificacao;
-    }
-
-    public void addNotificacaoDisco(String disco) {
-        notificacoesDisco.add(disco);
-    }
-
-    public void addNotificacaoArtista(String artista) {
-        notificacoesArtista.add(artista);
-    }
-
-    public void addNotificacaoGenero(String genero) {
-        notificacoesGenero.add(genero);
-    }
-
     private void notificar(Disco disco) {
-        notificacoesDisco.stream().filter(d -> disco.getTitulo().contains(d)).forEach(d -> {
-            servicoNotificacao.enviarNotificacao(canalNotificacao, "Novo disco adicionado: " + disco.getTitulo());
-        });
-
-        notificacoesArtista.stream().filter(d -> disco.getArtista().contains(d)).forEach(d -> {
-            servicoNotificacao.enviarNotificacao(canalNotificacao, "Novo disco do artista: " + disco.getArtista());
-        });
-
-        notificacoesGenero.stream().filter(d -> disco.getGenero().contains(d)).forEach(d -> {
-            servicoNotificacao.enviarNotificacao(canalNotificacao, "Novo disco do gênero: " + disco.getGenero());
-        });
+        interessados.forEach(interessado -> interessado.atualizar(disco));
     }
 
 }
